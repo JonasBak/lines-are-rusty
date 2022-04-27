@@ -20,7 +20,15 @@ pub fn render_pdf(path: &str, pages: &[Page]) -> io::Result<()> {
 
             for layer in &page.layers {
                 for line in &layer.lines {
-                    if line.points.is_empty() {
+                    if line.points.is_empty()
+                        || match line.brush_type {
+                            BrushType::Eraser
+                            | BrushType::Highlighter
+                            | BrushType::SelectionBrush
+                            | BrushType::EraseArea => true,
+                            _ => false,
+                        }
+                    {
                         continue;
                     }
                     let first_point = &line.points[0];
